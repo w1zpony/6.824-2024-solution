@@ -108,6 +108,7 @@ func make_config(t *testing.T, n int, unreliable bool, snapshot bool) *config {
 // shut down a Raft server but save its persistent state.
 func (cfg *config) crash1(i int) {
 	cfg.disconnect(i)
+	Debug(dTrace, "S%d crash", i)
 	cfg.net.DeleteServer(i) // disable client connections to the server.
 
 	cfg.mu.Lock()
@@ -272,6 +273,7 @@ func (cfg *config) applierSnap(i int, applyCh chan ApplyMsg) {
 // this server. since we cannot really kill it.
 func (cfg *config) start1(i int, applier func(int, chan ApplyMsg)) {
 	cfg.crash1(i)
+	Debug(dTrace, "S%d restart", i)
 
 	// a fresh set of outgoing ClientEnd names.
 	// so that old crashed instance's ClientEnds can't send.
@@ -355,7 +357,7 @@ func (cfg *config) cleanup() {
 // attach server i to the net.
 func (cfg *config) connect(i int) {
 	// fmt.Printf("connect(%d)\n", i)
-
+	Debug(dTrace, "S%d connect", i)
 	cfg.connected[i] = true
 
 	// outgoing ClientEnds
@@ -378,7 +380,7 @@ func (cfg *config) connect(i int) {
 // detach server i from the net.
 func (cfg *config) disconnect(i int) {
 	// fmt.Printf("disconnect(%d)\n", i)
-
+	Debug(dTrace, "S%d disconnect", i)
 	cfg.connected[i] = false
 
 	// outgoing ClientEnds
